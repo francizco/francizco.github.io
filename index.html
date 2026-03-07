@@ -1,98 +1,552 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frank — Software Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Frank Fuentes</title>
-
-    <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <style>
-    body {
-        padding-top: 70px;
-        /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+    :root {
+      --bg:        #09090f;
+      --surface:   #0f0f1a;
+      --border:    rgba(255,255,255,0.07);
+      --accent:    #4af4c2;
+      --accent2:   #6b7aff;
+      --text:      #e8e8f0;
+      --muted:     #6b6b80;
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
     }
-    </style>
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    html { scroll-behavior: smooth; }
 
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── noise overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    /* ── ambient blobs ── */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(74,244,194,0.10) 0%, transparent 70%);
+      top: -120px; left: -100px;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(107,122,255,0.12) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation: drift 22s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.1); }
+    }
+
+    /* ── layout ── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* ── nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      background: rgba(9,9,15,0.72);
+    }
+    nav .wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 58px;
+    }
+    .nav-logo {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.03em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+    .nav-links a:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ── hero ── */
+    #hero {
+      padding-top: 140px;
+      padding-bottom: 110px;
+    }
+
+    .eyebrow {
+      font-size: 0.70rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
+    }
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 28px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: clamp(2.8rem, 7vw, 5.2rem);
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      color: #fff;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.22s forwards;
+    }
+    h1 .line2 { color: var(--accent); }
+    h1 .line3 { 
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.34s forwards;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.46s forwards;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      padding: 13px 26px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.22s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #0a1a14;
+    }
+    .btn-primary:hover {
+      background: #6ffcd5;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(74,244,194,0.25);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.04);
+      transform: translateY(-2px);
+    }
+
+    /* ── divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── skills section ── */
+    #skills {
+      padding: 90px 0;
+    }
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 20px; height: 1px;
+      background: var(--accent2);
+    }
+
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .skill-card:hover {
+      border-color: rgba(74,244,194,0.3);
+      transform: translateY(-3px);
+    }
+    .skill-card .sk-title {
+      font-family: var(--font-head);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .skill-card .sk-tags {
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    /* ── experience section ── */
+    #experience {
+      padding-bottom: 90px;
+    }
+    .exp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .exp-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 20px;
+      padding: 26px 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .exp-item:hover {
+      border-color: rgba(107,122,255,0.3);
+      background: rgba(15,15,26,0.9);
+    }
+    .exp-company {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .exp-role {
+      font-size: 0.78rem;
+      color: var(--accent2);
+      margin-bottom: 8px;
+      letter-spacing: 0.03em;
+    }
+    .exp-desc {
+      font-size: 0.80rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .exp-year {
+      font-size: 0.70rem;
+      color: var(--muted);
+      white-space: nowrap;
+      padding-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── contact ── */
+    #contact {
+      padding-bottom: 100px;
+    }
+    .contact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 56px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 300px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .contact-card h2 {
+      font-family: var(--font-head);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+    .contact-card p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      max-width: 380px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* ── footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+    }
+    footer .wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    footer p {
+      font-size: 0.70rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── icons ── */
+    .icon { width: 16px; height: 16px; }
+
+    /* ── animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── responsive ── */
+    @media (max-width: 600px) {
+      .contact-card { padding: 36px 24px; }
+      .exp-item { grid-template-columns: 1fr; gap: 6px; }
+      .exp-year { padding-top: 0; }
+    }
+  </style>
 </head>
-
 <body>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#">Home</a>
-            </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li>
-                        <a href="projects.html">Projects</a>
-                    </li>
-                    <li>
-                        <a href="files/FuentesFrank_Resume.pdf">Resume</a>
-                    </li>
-                    <li>
-                        <a href="https://www.linkedin.com/in/francizco/">LinkedIn</a>
-                    </li>
-                    <li>
-                        <a href="mailto:frank@francizco.com">Contact</a>
-                    </li>
-                </ul>
-            </div>
-            <!-- /.navbar-collapse -->
-        </div>
-        <!-- /.container -->
-    </nav>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
 
-    <!-- Page Content -->
-    <div class="container">
+<!-- NAV -->
+<nav>
+  <div class="wrapper">
+    <a href="#hero" class="nav-logo">frank<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#skills">skills</a></li>
+      <li><a href="#experience">exp</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </div>
+</nav>
 
-        <div class="row">
-            <div class="col-lg-12 text-center">
-            <img src="images/seattleu-sunrise.jpg" alt="Seattle University sunrise over building tops" height="422" width="704">
-                <h1>Frank Fuentes</h1>
-                <p class="lead">
-                I'm a computer science and mathematics student at Seattle University. Graduating June 2018. 
-                I'm interested in mobile, machine learning and Neuroscience. Outside of my studies, I enjoy 
-                reading science fiction and fantasy, jogging, cooking and video games.
-                </p>
-            </div>
-        </div>
-        <!-- /.row -->
-
+<!-- HERO -->
+<section id="hero">
+  <div class="wrapper">
+    <p class="eyebrow">Available for new opportunities</p>
+    <h1>
+      Backend Software<br>
+      <span class="line2">Engineer.</span>
+    </h1>
+    <p class="hero-desc">
+      Backend engineer with 6+ years building distributed systems, traffic infrastructure, 
+      and high-scale services. Previously at Microsoft &amp; F5 Networks.
+    </p>
+    <div class="cta-row">
+      <!-- ★ REPLACE href WITH YOUR LINKEDIN URL ★ -->
+      <a href="https://linkedin.com/in/YOUR-HANDLE" target="_blank" rel="noopener" class="btn btn-primary">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+      <!-- ★ REPLACE href WITH PATH TO YOUR RESUME PDF ★ -->
+      <a href="resume.pdf" target="_blank" rel="noopener" class="btn btn-secondary">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/>
+        </svg>
+        Resume
+      </a>
     </div>
-    <!-- /.container -->
+  </div>
+</section>
 
-    <!-- jQuery Version 1.11.1 -->
-    <script src="js/jquery.js"></script>
+<hr class="divider" />
 
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrapper">
+    <p class="section-label">Technical skills</p>
+    <div class="skill-grid">
+      <div class="skill-card">
+        <div class="sk-title">Backend Systems</div>
+        <div class="sk-tags">Go · Distributed Systems<br>Microservices · gRPC · REST</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-title">Networking</div>
+        <div class="sk-tags">Traffic Management · Load Balancing<br>TCP/IP · F5 BIG-IP · Proxy</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-title">Cloud & Infra</div>
+        <div class="sk-tags">Azure · Kubernetes · Docker<br>CI/CD · Observability</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-title">Languages</div>
+        <div class="sk-tags">Go · C++ · Python · C#<br>TypeScript · Swift</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-title">Data & ML</div>
+        <div class="sk-tags">SQL · Vector Databases<br>LLM APIs · ML Pipelines</div>
+      </div>
+      <div class="skill-card">
+        <div class="sk-title">Observability</div>
+        <div class="sk-tags">Distributed Tracing · Metrics<br>Alerting · Log Analysis</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="wrapper" style="padding-top: 90px;">
+    <p class="section-label">Experience</p>
+    <div class="exp-list">
+      <div class="exp-item">
+        <div>
+          <div class="exp-company">Microsoft</div>
+          <div class="exp-role">Software Engineer II — Distributed Systems</div>
+          <div class="exp-desc">Built VM migration orchestration systems and large-scale observability infrastructure, improving reliability across Azure cloud services.</div>
+        </div>
+        <div class="exp-year">2022 – 2024</div>
+      </div>
+      <div class="exp-item" style="margin-top:12px;">
+        <div>
+          <div class="exp-company">F5 Networks</div>
+          <div class="exp-role">Software Engineer — Traffic &amp; Networking</div>
+          <div class="exp-desc">Developed Go-based backend services for network traffic management, proxy infrastructure, and high-throughput packet processing systems.</div>
+        </div>
+        <div class="exp-year">2019 – 2022</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrapper">
+    <div class="contact-card">
+      <h2>Let's connect.</h2>
+      <p>Open to senior engineering roles in backend infrastructure, traffic systems, and ML platforms.</p>
+      <div class="contact-links">
+        <!-- ★ REPLACE href WITH YOUR LINKEDIN URL ★ -->
+        <a href="https://linkedin.com/in/francizco" target="_blank" rel="noopener" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          View LinkedIn
+        </a>
+        <!-- ★ REPLACE href WITH PATH TO YOUR RESUME PDF ★ -->
+        <a href="resume.pdf" download class="btn btn-secondary">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/>
+          </svg>
+          Download Resume
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrapper">
+    <p>© 2026 Frank</p>
+    <p>Built with intention.</p>
+  </div>
+</footer>
 
 </body>
-
 </html>
